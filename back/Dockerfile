@@ -1,5 +1,5 @@
 # ===== BUILD =====
-FROM gradle:8.6-jdk21 AS build
+FROM gradle:9.3-jdk21 AS build
 WORKDIR /app
 
 COPY build.gradle settings.gradle ./
