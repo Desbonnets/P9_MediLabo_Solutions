@@ -1,6 +1,8 @@
-package com.medilabo.user;
+package medilabo.back.service;
 
 import org.springframework.stereotype.Service;
+import medilabo.back.repository.UserRepository;
+import medilabo.back.model.User;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.medilabo.user;
+package medilabo.back.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

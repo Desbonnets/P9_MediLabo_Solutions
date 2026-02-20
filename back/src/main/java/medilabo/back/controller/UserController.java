@@ -1,6 +1,8 @@
-package com.medilabo.user;
+package medilabo.back.controller;
 
 import org.springframework.web.bind.annotation.*;
+import medilabo.back.service.UserService;
+import medilabo.back.model.User;
 
 import java.util.List;
 
