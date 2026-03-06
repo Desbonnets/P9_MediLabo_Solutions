@@ -1,35 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect, useCallback } from 'react'
+import { getUsers, createUser, updateUser, deleteUser } from './api/userApi'
+import UserList from './components/UserList'
+import UserForm from './components/UserForm'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [users, setUsers] = useState([])
+  const [error, setError] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+
+  const loadUsers = useCallback(async () => {
+    try {
+      const data = await getUsers()
+      setUsers(data)
+      setError(null)
+    } catch (e) {
+      setError(e.message)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadUsers()
+  }, [loadUsers])
+
+  function handleCreate() {
+    setEditingUser(null)
+    setShowForm(true)
+  }
+
+  function handleEdit(user) {
+    setEditingUser(user)
+    setShowForm(true)
+  }
+
+  async function handleDelete(id) {
+    if (!confirm('Supprimer cet utilisateur ?')) return
+    try {
+      await deleteUser(id)
+      await loadUsers()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  async function handleSubmit(formData) {
+    try {
+      if (editingUser) {
+        await updateUser(editingUser.id, formData)
+      } else {
+        await createUser(formData)
+      }
+      setShowForm(false)
+      setEditingUser(null)
+      await loadUsers()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
+  function handleCancel() {
+    setShowForm(false)
+    setEditingUser(null)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <header>
+        <h1>MediLabo Solutions - Patients</h1>
+      </header>
+
+      <main>
+        {error && <div className="error">{error}</div>}
+
+        {showForm ? (
+          <UserForm
+            initial={editingUser}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
+        ) : (
+          <>
+            <button className="btn-primary" onClick={handleCreate}>
+              + Nouvel utilisateur
+            </button>
+            <UserList users={users} onEdit={handleEdit} onDelete={handleDelete} />
+          </>
+        )}
+      </main>
+    </div>
   )
 }
-
-export default App
