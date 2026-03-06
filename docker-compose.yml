@@ -35,5 +35,17 @@ services:
     depends_on:
       - back
 
+  front:
+    build:
+      context: ./front
+      target: dev
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - gateway
+
 volumes:
   mongo_data:
