@@ -1,17 +1,30 @@
 services:
   mongo:
     image: mongo:7
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
     ports:
       - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 
   back:
     build: ./back
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_MONGODB_URI: mongodb://root:rootpass@mongo:27017/medilabo?authSource=admin
     ports:
       - "8081:8081"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
 
   gateway:
     build: ./gateway
@@ -21,3 +34,18 @@ services:
       - "8080:8080"
     depends_on:
       - back
+
+  front:
+    build:
+      context: ./front
+      target: dev
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - gateway
+
+volumes:
+  mongo_data:
