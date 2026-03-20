@@ -1,21 +1,37 @@
 package medilabo.back.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-@Document(collection = "users")
+@Entity
+@Table(name = "patients")
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotBlank
+    @Column(nullable = false)
     private String firstName;
+
+    @NotBlank
+    @Column(nullable = false)
     private String lastName;
+
+    @NotNull
+    @Column(nullable = false)
     private LocalDate birthDate;
+
+    @NotBlank
+    @Column(nullable = false)
     private String gender;
+
     private String address;
+
     private String phone;
 
     public User() {}
@@ -30,7 +46,7 @@ public class User {
         this.phone = phone;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

@@ -19,16 +19,16 @@ public class UserService {
         return repository.findAll();
     }
 
-    public User findById(String id) {
+    public User findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
     }
 
     public User create(User user) {
         return repository.save(user);
     }
 
-    public User update(String id, User user) {
+    public User update(Long id, User user) {
         User existing = findById(id);
 
         existing.setFirstName(user.getFirstName());
@@ -41,7 +41,7 @@ public class UserService {
         return repository.save(existing);
     }
 
-    public void delete(String id) {
+    public void delete(Long id) {
         repository.deleteById(id);
     }
 }
