@@ -1,5 +1,6 @@
 package medilabo.back.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import medilabo.back.service.UserService;
 import medilabo.back.model.User;
@@ -27,12 +28,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         return service.create(user);
     }
 
     @PutMapping("/{id}")
-    public User update(@PathVariable Long id, @RequestBody User user) {
+    public User update(@PathVariable Long id, @Valid @RequestBody User user) {
         return service.update(id, user);
     }
 
