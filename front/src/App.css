@@ -141,6 +141,17 @@ main {
   border-color: #1a73e8;
 }
 
+.form-row input.input-error,
+.form-row select.input-error {
+  border-color: #d32f2f;
+}
+
+.field-error {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
 .form-actions {
   display: flex;
   gap: 0.8rem;

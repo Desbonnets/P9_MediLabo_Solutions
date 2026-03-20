@@ -9,6 +9,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
+  const [formApiErrors, setFormApiErrors] = useState({})
 
   const loadUsers = useCallback(async () => {
     try {
@@ -26,16 +27,18 @@ export default function App() {
 
   function handleCreate() {
     setEditingUser(null)
+    setFormApiErrors({})
     setShowForm(true)
   }
 
   function handleEdit(user) {
     setEditingUser(user)
+    setFormApiErrors({})
     setShowForm(true)
   }
 
   async function handleDelete(id) {
-    if (!confirm('Supprimer cet utilisateur ?')) return
+    if (!confirm('Supprimer ce patient ?')) return
     try {
       await deleteUser(id)
       await loadUsers()
@@ -45,6 +48,8 @@ export default function App() {
   }
 
   async function handleSubmit(formData) {
+    setFormApiErrors({})
+    setError(null)
     try {
       if (editingUser) {
         await updateUser(editingUser.id, formData)
@@ -55,13 +60,19 @@ export default function App() {
       setEditingUser(null)
       await loadUsers()
     } catch (e) {
-      setError(e.message)
+      if (e.fields) {
+        setFormApiErrors(e.fields)
+      } else {
+        setError(e.message)
+      }
     }
   }
 
   function handleCancel() {
     setShowForm(false)
     setEditingUser(null)
+    setFormApiErrors({})
+    setError(null)
   }
 
   return (
@@ -78,11 +89,12 @@ export default function App() {
             initial={editingUser}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
+            apiErrors={formApiErrors}
           />
         ) : (
           <>
             <button className="btn-primary" onClick={handleCreate}>
-              + Nouvel utilisateur
+              + Nouveau patient
             </button>
             <UserList users={users} onEdit={handleEdit} onDelete={handleDelete} />
           </>

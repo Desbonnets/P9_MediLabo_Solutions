@@ -1,15 +1,28 @@
 const BASE = '/api/users'
 
+async function handleResponse(res) {
+  if (res.ok) return res.status === 204 ? null : res.json()
+
+  let body = null
+  try { body = await res.json() } catch { /* pas de corps JSON */ }
+
+  if (res.status === 400 && body && typeof body === 'object' && !body.message) {
+    const err = new Error('Données invalides')
+    err.fields = body
+    throw err
+  }
+
+  throw new Error(body?.message || `Erreur ${res.status}`)
+}
+
 export async function getUsers() {
   const res = await fetch(BASE)
-  if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
-  return res.json()
+  return handleResponse(res)
 }
 
 export async function getUserById(id) {
   const res = await fetch(`${BASE}/${id}`)
-  if (!res.ok) throw new Error('Utilisateur introuvable')
-  return res.json()
+  return handleResponse(res)
 }
 
 export async function createUser(user) {
@@ -18,8 +31,7 @@ export async function createUser(user) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(user),
   })
-  if (!res.ok) throw new Error('Erreur lors de la création')
-  return res.json()
+  return handleResponse(res)
 }
 
 export async function updateUser(id, user) {
@@ -28,11 +40,10 @@ export async function updateUser(id, user) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(user),
   })
-  if (!res.ok) throw new Error('Erreur lors de la mise à jour')
-  return res.json()
+  return handleResponse(res)
 }
 
 export async function deleteUser(id) {
   const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' })
-  if (!res.ok) throw new Error('Erreur lors de la suppression')
+  return handleResponse(res)
 }
