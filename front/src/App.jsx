@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getUsers, createUser, updateUser, deleteUser } from './api/userApi'
+import { getNotesByPatient } from './api/notesApi'
 import UserList from './components/UserList'
 import UserForm from './components/UserForm'
+import NotesPanel from './components/NotesPanel'
 import './App.css'
 
 export default function App() {
@@ -10,6 +12,8 @@ export default function App() {
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [formApiErrors, setFormApiErrors] = useState({})
+  const [selectedPatient, setSelectedPatient] = useState(null)
+  const [notes, setNotes] = useState([])
 
   const loadUsers = useCallback(async () => {
     try {
@@ -24,6 +28,25 @@ export default function App() {
   useEffect(() => {
     loadUsers()
   }, [loadUsers])
+
+  async function handleShowNotes(patient) {
+    if (selectedPatient?.id === patient.id) {
+      setSelectedPatient(null)
+      setNotes([])
+      return
+    }
+    setSelectedPatient(patient)
+    await refreshNotes(patient.id)
+  }
+
+  async function refreshNotes(patId) {
+    try {
+      const data = await getNotesByPatient(patId)
+      setNotes(data)
+    } catch (e) {
+      setError(e.message)
+    }
+  }
 
   function handleCreate() {
     setEditingUser(null)
@@ -41,6 +64,10 @@ export default function App() {
     if (!confirm('Supprimer ce patient ?')) return
     try {
       await deleteUser(id)
+      if (selectedPatient?.id === id) {
+        setSelectedPatient(null)
+        setNotes([])
+      }
       await loadUsers()
     } catch (e) {
       setError(e.message)
@@ -96,7 +123,20 @@ export default function App() {
             <button className="btn-primary" onClick={handleCreate}>
               + Nouveau patient
             </button>
-            <UserList users={users} onEdit={handleEdit} onDelete={handleDelete} />
+            <UserList
+              users={users}
+              selectedPatientId={selectedPatient?.id}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onShowNotes={handleShowNotes}
+            />
+            {selectedPatient && (
+              <NotesPanel
+                patient={selectedPatient}
+                notes={notes}
+                onNoteAdded={() => refreshNotes(selectedPatient.id)}
+              />
+            )}
           </>
         )}
       </main>

@@ -1,6 +1,6 @@
-export default function UserList({ users, onEdit, onDelete }) {
+export default function UserList({ users, selectedPatientId, onEdit, onDelete, onShowNotes }) {
   if (users.length === 0) {
-    return <p>Aucun utilisateur.</p>
+    return <p>Aucun patient.</p>
   }
 
   return (
@@ -18,7 +18,7 @@ export default function UserList({ users, onEdit, onDelete }) {
       </thead>
       <tbody>
         {users.map((u) => (
-          <tr key={u.id}>
+          <tr key={u.id} className={selectedPatientId === u.id ? 'row-selected' : ''}>
             <td>{u.lastName}</td>
             <td>{u.firstName}</td>
             <td>{u.birthDate}</td>
@@ -26,6 +26,9 @@ export default function UserList({ users, onEdit, onDelete }) {
             <td>{u.address}</td>
             <td>{u.phone}</td>
             <td>
+              <button onClick={() => onShowNotes(u)} className="btn-notes">
+                {selectedPatientId === u.id ? 'Masquer notes' : 'Notes'}
+              </button>
               <button onClick={() => onEdit(u)}>Modifier</button>
               <button onClick={() => onDelete(u.id)} className="btn-danger">Supprimer</button>
             </td>

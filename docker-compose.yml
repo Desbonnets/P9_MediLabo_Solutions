@@ -16,6 +16,19 @@ services:
       timeout: 5s
       retries: 5
 
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   back:
     build: ./back
     environment:
@@ -28,6 +41,16 @@ services:
       postgres:
         condition: service_healthy
 
+  notes:
+    build: ./notes
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/medilabo_notes
+    ports:
+      - "8082:8082"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
   gateway:
     build: ./gateway
     environment:
@@ -36,6 +59,7 @@ services:
       - "8080:8080"
     depends_on:
       - back
+      - notes
 
   front:
     build:
@@ -51,3 +75,4 @@ services:
 
 volumes:
   postgres_data:
+  mongodb_data:

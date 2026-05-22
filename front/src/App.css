@@ -104,6 +104,93 @@ main {
   background: #b71c1c !important;
 }
 
+/* Notes */
+.row-selected td {
+  background: #e8f0fe;
+}
+
+.btn-notes {
+  margin-right: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: #43a047;
+  color: white;
+}
+
+.btn-notes:hover {
+  background: #2e7d32;
+}
+
+.notes-panel {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.notes-panel h3 {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  color: #1a73e8;
+}
+
+.notes-empty {
+  color: #9e9e9e;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.notes-list {
+  list-style: none;
+  margin-bottom: 1.2rem;
+}
+
+.note-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.note-content {
+  font-family: inherit;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  margin: 0;
+  color: #333;
+}
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.note-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.note-textarea {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.note-textarea:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
 /* Form */
 .user-form {
   max-width: 480px;
