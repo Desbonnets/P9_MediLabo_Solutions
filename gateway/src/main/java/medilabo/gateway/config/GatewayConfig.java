@@ -15,6 +15,8 @@ public class GatewayConfig {
                         .uri("http://back:8081"))
                 .route("notes_route", r -> r.path("/api/notes/**")
                         .uri("http://notes:8082"))
+                .route("risk_route", r -> r.path("/api/assess/**")
+                        .uri("http://risk:8083"))
                 .build();
     }
 }

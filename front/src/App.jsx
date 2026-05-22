@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getUsers, createUser, updateUser, deleteUser } from './api/userApi'
 import { getNotesByPatient } from './api/notesApi'
+import { getPatientRisk } from './api/riskApi'
 import UserList from './components/UserList'
 import UserForm from './components/UserForm'
 import NotesPanel from './components/NotesPanel'
@@ -8,6 +9,7 @@ import './App.css'
 
 export default function App() {
   const [users, setUsers] = useState([])
+  const [risks, setRisks] = useState({})
   const [error, setError] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
@@ -20,10 +22,21 @@ export default function App() {
       const data = await getUsers()
       setUsers(data)
       setError(null)
+      loadRisks(data)
     } catch (e) {
       setError(e.message)
     }
   }, [])
+
+  async function loadRisks(patients) {
+    const entries = await Promise.all(
+      patients.map(async (p) => {
+        const risk = await getPatientRisk(p.id)
+        return [p.id, risk]
+      })
+    )
+    setRisks(Object.fromEntries(entries))
+  }
 
   useEffect(() => {
     loadUsers()
@@ -125,6 +138,7 @@ export default function App() {
             </button>
             <UserList
               users={users}
+              risks={risks}
               selectedPatientId={selectedPatient?.id}
               onEdit={handleEdit}
               onDelete={handleDelete}
