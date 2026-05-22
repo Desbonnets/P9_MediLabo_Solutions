@@ -11,10 +11,10 @@ public class GatewayConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                // Redirige /api/users/** vers le back
                 .route("back_users_route", r -> r.path("/api/users/**")
                         .uri("http://back:8081"))
-
+                .route("notes_route", r -> r.path("/api/notes/**")
+                        .uri("http://notes:8082"))
                 .build();
     }
 }
