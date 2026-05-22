@@ -51,6 +51,17 @@ services:
       mongodb:
         condition: service_healthy
 
+  risk:
+    build: ./risk
+    environment:
+      SERVICES_PATIENT_URL: http://back:8081
+      SERVICES_NOTES_URL: http://notes:8082
+    ports:
+      - "8083:8083"
+    depends_on:
+      - back
+      - notes
+
   gateway:
     build: ./gateway
     environment:
@@ -60,6 +71,7 @@ services:
     depends_on:
       - back
       - notes
+      - risk
 
   front:
     build:
