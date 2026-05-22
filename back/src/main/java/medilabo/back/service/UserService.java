@@ -1,6 +1,8 @@
 package medilabo.back.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import medilabo.back.repository.UserRepository;
 import medilabo.back.model.User;
 
@@ -21,7 +23,7 @@ public class UserService {
 
     public User findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient introuvable : " + id));
     }
 
     public User create(User user) {
@@ -42,6 +44,7 @@ public class UserService {
     }
 
     public void delete(Long id) {
+        findById(id);
         repository.deleteById(id);
     }
 }
