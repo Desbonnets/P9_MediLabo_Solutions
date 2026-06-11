@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Contrôleur REST du microservice risk.
+ * Expose l'endpoint d'évaluation du risque de diabète sur {@code /api/assess}.
+ */
 @RestController
 @RequestMapping("/api/assess")
 public class RiskController {
@@ -17,6 +21,13 @@ public class RiskController {
         this.riskService = riskService;
     }
 
+    /**
+     * {@code GET /api/assess/{patId}}
+     * Évalue le niveau de risque de diabète d'un patient.
+     *
+     * @param patId identifiant du patient
+     * @return {@link RiskResponseDto} contenant le patId et le niveau de risque (200 OK)
+     */
     @GetMapping("/{patId}")
     public RiskResponseDto assess(@PathVariable Long patId) {
         String risk = riskService.assessRisk(patId);
