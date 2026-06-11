@@ -54,8 +54,12 @@ export default function App() {
 
   async function refreshNotes(patId) {
     try {
-      const data = await getNotesByPatient(patId)
+      const [data, risk] = await Promise.all([
+        getNotesByPatient(patId),
+        getPatientRisk(patId),
+      ])
       setNotes(data)
+      setRisks(prev => ({ ...prev, [patId]: risk }))
     } catch (e) {
       setError(e.message)
     }
