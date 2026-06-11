@@ -1,8 +1,8 @@
-package medilabo.back.controller;
+package medilabo.notes.controller;
 
 import tools.jackson.databind.ObjectMapper;
-import medilabo.back.model.User;
-import medilabo.back.service.UserService;
+import medilabo.notes.model.Note;
+import medilabo.notes.service.NoteService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -12,7 +12,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,8 +21,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
-class UserControllerTest {
+@WebMvcTest(NoteController.class)
+class NoteControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,92 +31,81 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private UserService userService;
+    private NoteService noteService;
 
-    private User sampleUser() {
-        return new User("Jean", "Dupont", LocalDate.of(1980, 3, 15), "M", "1 rue de la Paix", "01-23-45-67-89");
+    private Note sampleNote() {
+        return new Note(1L, "Patient présente un cholestérol élevé.");
     }
 
     @Test
-    void getAll_returns200WithList() throws Exception {
-        when(userService.findAll()).thenReturn(List.of(sampleUser()));
-        mockMvc.perform(get("/api/users"))
+    void getByPatient_returns200WithList() throws Exception {
+        when(noteService.findByPatId(1L)).thenReturn(List.of(sampleNote()));
+        mockMvc.perform(get("/api/notes/patient/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName").value("Jean"));
+                .andExpect(jsonPath("$[0].content").value("Patient présente un cholestérol élevé."));
     }
 
     @Test
     void getById_existingId_returns200() throws Exception {
-        when(userService.findById(1L)).thenReturn(sampleUser());
-        mockMvc.perform(get("/api/users/1"))
+        when(noteService.findById("abc")).thenReturn(sampleNote());
+        mockMvc.perform(get("/api/notes/abc"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.lastName").value("Dupont"));
+                .andExpect(jsonPath("$.content").value("Patient présente un cholestérol élevé."));
     }
 
     @Test
     void getById_unknownId_returns404() throws Exception {
-        when(userService.findById(99L))
+        when(noteService.findById("xyz"))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
-        mockMvc.perform(get("/api/users/99"))
+        mockMvc.perform(get("/api/notes/xyz"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void create_validBody_returns201() throws Exception {
-        User user = sampleUser();
-        when(userService.create(any())).thenReturn(user);
+        Note note = sampleNote();
+        when(noteService.create(any())).thenReturn(note);
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/notes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(note)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName").value("Jean"));
-    }
-
-    @Test
-    void create_missingRequiredField_returns400() throws Exception {
-        String body = """
-                {"firstName":"","lastName":"","birthDate":"1980-03-15","gender":""}
-                """;
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest());
+                .andExpect(jsonPath("$.content").value("Patient présente un cholestérol élevé."));
     }
 
     @Test
     void update_existingId_returns200() throws Exception {
-        User user = sampleUser();
-        when(userService.update(eq(1L), any())).thenReturn(user);
+        Note note = sampleNote();
+        when(noteService.update(eq("abc"), any())).thenReturn(note);
 
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/notes/abc")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
+                        .content(objectMapper.writeValueAsString(note)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void update_unknownId_returns404() throws Exception {
-        when(userService.update(eq(99L), any()))
+        when(noteService.update(eq("xyz"), any()))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        mockMvc.perform(put("/api/users/99")
+        mockMvc.perform(put("/api/notes/xyz")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleUser())))
+                        .content(objectMapper.writeValueAsString(sampleNote())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void delete_existingId_returns204() throws Exception {
-        mockMvc.perform(delete("/api/users/1"))
+        mockMvc.perform(delete("/api/notes/abc"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void delete_unknownId_returns404() throws Exception {
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND))
-                .when(userService).delete(99L);
-        mockMvc.perform(delete("/api/users/99"))
+                .when(noteService).delete("xyz");
+        mockMvc.perform(delete("/api/notes/xyz"))
                 .andExpect(status().isNotFound());
     }
 }
